@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-contract MaxCoolDownPolicy is IFaucetPolicy {
+contract UserCapPolicy is IFaucetPolicy {
     /*//////////////////////////////////////////////////////////////
                                  TYPES
     //////////////////////////////////////////////////////////////*/
@@ -10,12 +10,13 @@ contract MaxCoolDownPolicy is IFaucetPolicy {
     /*//////////////////////////////////////////////////////////////
                             STATE VARIABLES
     //////////////////////////////////////////////////////////////*/
-    uint256 public immutable maxCooldown;
-    mapping (address => uint) lastClaimTime;
+    mapping (address => uint) userAmountClaimed;
+    uint256 public immutable userCap;
+    uint256 public immutable dripAmount;
+
     /*//////////////////////////////////////////////////////////////
                                  EVENTS
     //////////////////////////////////////////////////////////////*/
-
 
     /*//////////////////////////////////////////////////////////////
                                  ERRORS
@@ -23,8 +24,9 @@ contract MaxCoolDownPolicy is IFaucetPolicy {
 
 
 /*CONSTRUCTOR*/
-    constructor(uint256 _maxCooldown) {
-        maxCooldown = _maxCooldown;
+    constructor(uint256 _userCap, uint256 _dripAmount) {
+        userCap = _userCap;
+        dripAmount = _dripAmount;
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -32,9 +34,9 @@ contract MaxCoolDownPolicy is IFaucetPolicy {
     //////////////////////////////////////////////////////////////*/
 
     function validateClaim(address user) public view override returns (bool) {
-        return block.timestamp>=lastClaimTime[user]+maxCooldown;
+        return userAmountClaimed[user] < userCap;
     }
     function afterClaim(address user) public override {
-        lastClaimTime[user] = block.timestamp;
+        userAmountClaimed[user] += dripAmount;
     }
 }

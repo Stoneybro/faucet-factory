@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-contract MaxCoolDownPolicy is IFaucetPolicy {
+contract GlobalCapPolicy is IFaucetPolicy {
     /*//////////////////////////////////////////////////////////////
                                  TYPES
     //////////////////////////////////////////////////////////////*/
@@ -10,8 +10,10 @@ contract MaxCoolDownPolicy is IFaucetPolicy {
     /*//////////////////////////////////////////////////////////////
                             STATE VARIABLES
     //////////////////////////////////////////////////////////////*/
-    uint256 public immutable maxCooldown;
-    mapping (address => uint) lastClaimTime;
+    uint256 public immutable globalCap;
+    uint256 public immutable dripAmount;
+    uint256 public totalDistributed;
+
     /*//////////////////////////////////////////////////////////////
                                  EVENTS
     //////////////////////////////////////////////////////////////*/
@@ -23,8 +25,9 @@ contract MaxCoolDownPolicy is IFaucetPolicy {
 
 
 /*CONSTRUCTOR*/
-    constructor(uint256 _maxCooldown) {
-        maxCooldown = _maxCooldown;
+    constructor(uint256 _globalCap, uint256 _dripAmount) {
+        globalCap = _globalCap;
+        dripAmount = _dripAmount;
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -32,9 +35,9 @@ contract MaxCoolDownPolicy is IFaucetPolicy {
     //////////////////////////////////////////////////////////////*/
 
     function validateClaim(address user) public view override returns (bool) {
-        return block.timestamp>=lastClaimTime[user]+maxCooldown;
+        return totalDistributed + dripAmount <= globalCap;
     }
     function afterClaim(address user) public override {
-        lastClaimTime[user] = block.timestamp;
+        totalDistributed += dripAmount;
     }
 }
