@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
+import {IFaucetPolicy} from "./interfaces/IFaucetPolicy.sol";
 
-contract MaxCoolDownPolicy is IFaucetPolicy {
+contract MaxCooldownPolicy is IFaucetPolicy {
     /*//////////////////////////////////////////////////////////////
                                  TYPES
     //////////////////////////////////////////////////////////////*/

@@ -34,14 +34,16 @@ contract EthFaucet is Pausable, ReentrancyGuard, Initializable {
 
     function initialize(uint256 _dripAmount, address[] memory _policies) external initializer {
         dripAmount = _dripAmount;
-        policies = IFaucetPolicy[](_policies);
+        for (uint256 i = 0; i < _policies.length; i++) {
+            policies.push(IFaucetPolicy(_policies[i]));
+        }
     }
 
     /*//////////////////////////////////////////////////////////////
                                FUNCTIONS
     //////////////////////////////////////////////////////////////*/
 
-    function claimETH() external nonReentrant whenNotPaused {
+    function claim() external nonReentrant whenNotPaused {
         for (uint256 i = 0; i < policies.length; i++) {
             if (!policies[i].validateClaim(msg.sender)) revert EthFaucet__ValidationFailed();
         }
@@ -52,6 +54,10 @@ contract EthFaucet is Pausable, ReentrancyGuard, Initializable {
 
         (bool success,) = payable(msg.sender).call{value:dripAmount}("");
         if (!success) revert EthFaucet__TransferFailed();
+        for (uint256 i = 0; i < policies.length; i++) {
+            policies[i].afterClaim(msg.sender);
+        }
         emit Claimed(msg.sender, dripAmount);
     }
+    receive() external payable {}
 }

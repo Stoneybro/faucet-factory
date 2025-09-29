@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
+import {IFaucetPolicy} from "./interfaces/IFaucetPolicy.sol";
 
 contract UserCapPolicy is IFaucetPolicy {
     /*//////////////////////////////////////////////////////////////
