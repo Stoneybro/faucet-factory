@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
+import {IFaucetPolicy} from "./interfaces/IFaucetPolicy.sol";
 
 contract GlobalCapPolicy is IFaucetPolicy {
     /*//////////////////////////////////////////////////////////////
                                  TYPES
     //////////////////////////////////////////////////////////////*/
-
 
     /*//////////////////////////////////////////////////////////////
                             STATE VARIABLES
@@ -18,13 +18,11 @@ contract GlobalCapPolicy is IFaucetPolicy {
                                  EVENTS
     //////////////////////////////////////////////////////////////*/
 
-
     /*//////////////////////////////////////////////////////////////
                                  ERRORS
     //////////////////////////////////////////////////////////////*/
 
-
-/*CONSTRUCTOR*/
+    /*CONSTRUCTOR*/
     constructor(uint256 _globalCap, uint256 _dripAmount) {
         globalCap = _globalCap;
         dripAmount = _dripAmount;
@@ -37,6 +35,7 @@ contract GlobalCapPolicy is IFaucetPolicy {
     function validateClaim(address user) public view override returns (bool) {
         return totalDistributed + dripAmount <= globalCap;
     }
+
     function afterClaim(address user) public override {
         totalDistributed += dripAmount;
     }

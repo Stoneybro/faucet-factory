@@ -38,7 +38,9 @@ contract ERC20Faucet is ReentrancyGuard, Pausable, Initializable {
     function initialize( address _token, uint256 _dripAmount, address[] memory _policies) external initializer {
         token = IERC20(_token);
         dripAmount = _dripAmount;
-        policies = IFaucetPolicy[](_policies);
+        for (uint256 i = 0; i < _policies.length; i++) {
+            policies.push(IFaucetPolicy(_policies[i]));
+        }
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -55,7 +57,9 @@ contract ERC20Faucet is ReentrancyGuard, Pausable, Initializable {
         hasClaimed[msg.sender] = true;
 
         token.safeTransfer(msg.sender, dripAmount);
-
+        for (uint256 i = 0; i < policies.length; i++) {
+            policies[i].afterClaim(msg.sender);
+        }
         emit Claimed(msg.sender, dripAmount);
     }
 }

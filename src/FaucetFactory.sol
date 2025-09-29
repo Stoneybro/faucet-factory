@@ -57,13 +57,13 @@ contract FaucetFactory {
 
     function createErc20Faucet(address _token, uint256 _dripAmount, address[] memory policies)
         public
-        returns (address)
+        returns (address faucet)
     {
         if (userFaucetClone[msg.sender][1] != address(0)) revert FaucetFactory__FaucetAlreadyCreated();
         bytes32 salt = keccak256(abi.encodePacked(msg.sender));
         address predictedAddress = Clones.predictDeterministicAddress(i_Erc20FaucetImplementation, salt);
         if (predictedAddress.code.length != 0) revert FaucetFactory__FaucetAlreadyCreated();
-        address faucet = Clones.cloneDeterministic(i_Erc20FaucetImplementation, salt);
+        faucet = Clones.cloneDeterministic(i_Erc20FaucetImplementation, salt);
         userFaucetClone[msg.sender][1] = faucet;
         try ERC20Faucet(payable(faucet)).initialize(_token, _dripAmount, policies) {}
         catch {
